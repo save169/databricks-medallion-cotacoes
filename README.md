@@ -6,86 +6,88 @@
 
 ---
 
-## Descrição
+## Description
 
-Um pipeline de engenharia de dados de ponta a ponta, construído no Databricks, implementando a **Medallion Architecture** (Bronze, Silver, Gold). O pipeline ingere payloads JSON de taxas de câmbio multi-moeda, aplica esquemas automatizados e validações de qualidade de dados, e calcula métricas financeiras agregadas diárias prontas para BI.
+An end-to-end data engineering pipeline built on Databricks, implementing the **Medallion Architecture** (Bronze, Silver, Gold). The pipeline ingests multi-currency exchange rate JSON payloads, applies automated schemas and data quality validations, and calculates daily aggregated financial metrics ready for BI.
+
+> **Note:** If the project is imported into Databricks in production, you can use the **Exchange Rates Data API** for data ingestion. The access key (API KEY) should be stored in a **Databricks Secret** to ensure security and proper operation.
 
 ---
 
-##  Arquitetura & Data Pipeline
+## Architecture & Data Pipeline
 
 mermaid
 graph TD
-    A[External API / JSON Source] --> B[BRONZE LAYER<br>(bronze_cotacoes_raw)<br>Ingestão com preservação de esquema bruto<br>Colunas de auditoria de timestamp]
-    B --> C[SILVER LAYER<br>(silver_cotacoes_limpo)<br>Limpeza, tipagem estrita (Double/Timestamp)<br>Deduplicação e validação de esquema]
-    C --> D[GOLD LAYER<br>(gold_cotacoes_diarias)<br>Agregações de negócio (Min/Max/Média Diária)<br>Tabelas Delta otimizadas para Power BI/SQL]
+    A[External API / JSON Source] --> B[BRONZE LAYER<br>(bronze_cotacoes_raw)<br>Ingestion with raw schema preservation<br>Audit timestamp columns]
+    B --> C[SILVER LAYER<br>(silver_cotacoes_limpo)<br>Cleaning, strict typing (Double/Timestamp)<br>Deduplication and schema validation]
+    C --> D[GOLD LAYER<br>(gold_cotacoes_diarias)<br>Business aggregations (Min/Max/Daily Average)<br>Delta tables optimized for Power BI/SQL]
 
 
 ---
 
-### 💡 Principais Features & Destaques
+### 💡 Key Features & Highlights
 
-- **Medallion Lakehouse Pattern:** Separação completa entre armazenamento bruto, transformações limpas e modelos de agregação.
-- **Transações ACID:** Baseado em Delta Lake, com enforcement de esquema, evolução de esquema e time-travel.
-- **Limpeza & Validação:** Tipagem estrita para números financeiros, eliminação de duplicatas e remoção de valores nulos.
-- **Governança:** Pronto para Unity Catalog (catalog.schema.table).
+- **Medallion Lakehouse Pattern:** Complete separation between raw storage, clean transformations, and aggregation models.
+- **ACID Transactions:** Based on Delta Lake, with schema enforcement, schema evolution, and time-travel.
+- **Cleaning & Validation:** Strict typing for financial numbers, duplicate elimination, and removal of null values.
+- **Governance:** Ready for Unity Catalog (catalog.schema.table).
 
 ---
 
-## 📁 Estrutura do Repositório
+## 📁 Repository Structure
 
 plaintext
 databricks-medallion-cotacoes/
-├── README.md                       # Documentação técnica principal
-├── notebooks/                      # Notebooks Databricks (pipeline)
-│   ├── 01_bronze_ingestao.py       # Ingestão JSON bruta & rastreamento de metadata
-│   ├── 02_silver_transformacao.py  # Limpeza, cast de tipos & deduplicação
-│   └── 03_gold_agregacao.py        # Agregação de métricas diárias para analytics
-└── docs/                          # Documentação adicional
+├── README.md                       # Main technical documentation
+├── notebooks/                      # Databricks Notebooks (pipeline)
+│   ├── 01_bronze_ingestao.py       # Raw JSON ingestion & metadata tracking
+│   ├── 02_silver_transformacao.py  # Cleaning, type casting & deduplication
+│   └── 03_gold_agregacao.py        # Daily metric aggregation for analytics
+└── docs/                          # Additional documentation
 
 
 ---
 
-## 🚀 Como Executar no Databricks
+## 🚀 How to Run on Databricks
 
-**Pré-requisitos:**
-- Workspace Databricks (Community ou Cloud)
-- Ambiente PySpark & Delta Lake
-- Fonte de dados JSON configurada no Unity Catalog Volume/DBFS
+**Prerequisites:**
+- Databricks Workspace (Community or Cloud)
+- PySpark & Delta Lake environment
+- JSON data source configured in Unity Catalog Volume/DBFS
 
-**Passos:**
-1. Clone o repositório: Workspace → Repos → Add Repo (URL do GitHub)
-2. Execute os notebooks sequencialmente:
-   - `01_bronze_ingestao`: Popula camada Bronze
-   - `02_silver_transformacao`: Limpa dados
-   - `03_gold_agregacao`: Calcula tabelas analíticas
-
----
-
-## 📊 Output Analítico (Gold Layer)
-
-| Coluna                | Tipo      | Descrição                                      |
-|-----------------------|-----------|------------------------------------------------|
-| data_referencia       | Date      | Data de referência da negociação               |
-| moeda_origem          | String    | Código da moeda base (ex: USD, EUR)            |
-| nome_par              | String    | Nome completo do par de moedas                 |
-| media_valor_compra    | Double    | Média diária arredondada de compra             |
-| media_valor_venda     | Double    | Média diária arredondada de venda              |
-| max_valor_venda       | Double    | Maior taxa de venda registrada no intervalo    |
-| min_valor_venda       | Double    | Menor taxa de venda registrada no intervalo    |
+**Steps:**
+1. Clone the repository: Workspace → Repos → Add Repo (GitHub URL)
+2. Run the notebooks sequentially:
+   - `01_bronze_ingestao`: Populate Bronze layer
+   - `02_silver_transformacao`: Clean data
+   - `03_gold_agregacao`: Calculate analytical tables
 
 ---
 
-## 🛠️ Tech Stack & Ferramentas
+## 📊 Analytical Output (Gold Layer)
+
+ Column                | Type      | Description                                      |
+-----------------------|-----------|--------------------------------------------------|
+ data_referencia       | Date      | Reference date of the transaction                |
+ moeda_origem          | String    | Base currency code (e.g., USD, EUR)              |
+ nome_par              | String    | Full name of the currency pair                   |
+ media_valor_compra    | Double    | Rounded daily average buy rate                   |
+ media_valor_venda     | Double    | Rounded daily average sell rate                  |
+ max_valor_venda       | Double    | Highest sell rate recorded in the interval       |
+ min_valor_venda       | Double    | Lowest sell rate recorded in the interval        |
+
+---
+
+## 🛠️ Tech Stack & Tools
 
 - **Compute & Processing:** Apache Spark (PySpark), Databricks Repos
 - **Storage Layer:** Delta Lake
-- **Governança & Metastore:** Unity Catalog
-- **Linguagem:** Python 3.x, SQL
+- **Governance & Metastore:** Unity Catalog
+- **Language:** Python 3.x, SQL
 
 ---
 
-## 👤 Autor & Contato
+## 👤 Author & Contact
 
 - **Salvador Peres — Data Engineer**
 - [LinkedIn](https://www.linkedin.com/in/salvador-inacio-peres/)
