@@ -12,7 +12,7 @@ Um pipeline de engenharia de dados de ponta a ponta, construído no Databricks, 
 
 ---
 
-## 🏗️ Arquitetura & Data Pipeline
+##  Arquitetura & Data Pipeline
 
 mermaid
 graph TD
@@ -36,12 +36,12 @@ graph TD
 
 plaintext
 databricks-medallion-cotacoes/
-├── README.md                           # Documentação técnica
-├── notebooks/
-│   ├── 01_bronze_ingestao.py           # Ingestão JSON bruta & rastreamento de metadata
-│   ├── 02_silver_transformacao.py      # Limpeza, cast de tipos & deduplicação
-│   └── 03_gold_agregacao.py            # Agregação de métricas diárias para analytics
-└── docs/                               # Documentação adicional
+├── README.md                       # Documentação técnica principal
+├── notebooks/                      # Notebooks Databricks (pipeline)
+│   ├── 01_bronze_ingestao.py       # Ingestão JSON bruta & rastreamento de metadata
+│   ├── 02_silver_transformacao.py  # Limpeza, cast de tipos & deduplicação
+│   └── 03_gold_agregacao.py        # Agregação de métricas diárias para analytics
+└── docs/                          # Documentação adicional
 
 
 ---
